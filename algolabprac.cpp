@@ -45,45 +45,28 @@ const int inf = /*0x3f3f3f3f*/1e18+10;
 const double Pi = 3.14159265;
 #define F first
 #define S second
-int maxProfit(int price[], int start, int end) 
-{ 
-  
-    // If the stocks can't be bought 
-    if (end <= start) 
-        return 0; 
-  
-    // Initialise the profit 
-    int profit = 0; 
-  
-    // The day at which the stock 
-    // must be bought 
-    for (int i = start; i < end; i++) { 
-  
-        // The day at which the 
-        // stock must be sold 
-        for (int j = i + 1; j <= end; j++) { 
-  
-            // If byuing the stock at ith day and 
-            // selling it at jth day is profitable 
-            if (price[j] > price[i]) { 
-  
-                // Update the current profit 
-                int curr_profit = price[j] - price[i] 
-                                  + maxProfit(price, start, i - 1) 
-                                  + maxProfit(price, j + 1, end); 
-  
-                // Update the maximum profit so far 
-                profit = max(profit, curr_profit); 
-            } 
-        } 
-    } 
-    return profit; 
-} 
-int n,k,a[N];
+int n,m,a[N],b[N],C[N];
 void solve(){
-  cin>>n;
-  rep(i,0,n-1)cin>>a[i];
-  cout<<1000+maxProfit(a,0,n-1);
+	cin>>n>>m;
+	rep(i,1,n)cin>>a[i];
+	rep(i,1,m)cin>>b[i];
+	vvi dp(n+1,vi(m+1,inf)),c(n+1,vi(m+1,0));
+	rep(i,0,m)dp[0][i]=0;
+	int ma=0;
+	rep(i,1,n){
+		rep(j,1,m)
+			c[i][j]=(a[i]&b[j]);
+		sort(all(c[i]));
+		ma=max(ma,c[i][1]);
+	}
+	rep(i,1,n)C[i]=c[i][1];
+	int ans=0,tmp=0;
+	rep(i,1,n){
+		ans=inf;
+		rep(j,1,m)ans=min(ans,ma|(a[i]&b[j]));
+		tmp|=ans;
+	}
+	cout<<tmp;
 }
 int32_t main()
 {

@@ -1,0 +1,7 @@
+for z in range(int(input())):
+    x = input()
+    ans = 0
+    for i in range(len(x)):
+        ans += 10
+    ans += int(x[0]) * 10
+    print(ans)

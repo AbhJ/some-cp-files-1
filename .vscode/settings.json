@@ -1,0 +1,26 @@
+{
+	"editor.insertSpaces": false,
+	"files.associations": {
+		"tuple": "cpp",
+		"random": "cpp",
+		"type_traits": "cpp",
+		"iostream": "cpp",
+		"functional": "cpp",
+		"cmath": "cpp",
+		"array": "cpp",
+		"deque": "cpp",
+		"forward_list": "cpp",
+		"list": "cpp",
+		"string": "cpp",
+		"unordered_map": "cpp",
+		"unordered_set": "cpp",
+		"vector": "cpp",
+		"string_view": "cpp",
+		"initializer_list": "cpp",
+		"regex": "cpp",
+		"valarray": "cpp"
+	},
+	"editor.detectIndentation": false,
+	"javascript.format.insertSpaceAfterSemicolonInForStatements": false,
+	"C_Cpp.errorSquiggles": "Disabled"
+}

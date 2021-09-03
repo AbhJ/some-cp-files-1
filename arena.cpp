@@ -45,22 +45,12 @@ const int inf = /*0x3f3f3f3f*/1e18+10;
 const double Pi = 3.14159265;
 #define F first
 #define S second
-int n,a[N],b[N],cnt[N],pos[N];
 void solve(){
-  cin>>n;set<int>s[n+1];int ans=0;
-  rep(i,1,n)cnt[i]=0,pos[i]=0,s[i].clear();
-  rep(i,1,n)cin>>a[i],cnt[a[i]]++;
-  rep(i,1,n)cin>>b[i],cnt[b[i]]++;
-  rep(i,1,n)if(cnt[i]!=2){cout<<-1;return;}
-  rep(i,1,n)pos[a[i]]=i,pos[b[i]]=i;
-  rep(i,1,n)if(cnt[i]==2){s[i].insert(pos[i]);}
-  rep(i,1,n)if(s[i].empty()^1)ans++;cout<<ans<<"\n";
-  rep(i,1,n)if(s[i].empty()^1)cout<<*s[i].rbegin()<<" ";
 }
 int32_t main()
 {
   ibs;cti;
-  // solve();return 0;
+  solve();return 0;
   /*,cout<<"\n"*/;
   // cout<<"\n";
   int xx=0;

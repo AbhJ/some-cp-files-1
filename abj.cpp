@@ -23,11 +23,11 @@
 #define ibs ios_base::sync_with_stdio(false)
 #define cti cin.tie(0)
 #define bp __builtin_popcount
-#define pb push_back
+#define pb emplace_back
 #define koto_memory(a) cout<<(sizeof(a)/1048576.0)<<" MB";
-#define res(v) v.resize(unique(v.begin(), v.end()) - v.begin());
-#define cnt_res(v) std::distance(v.begin(),std::unique(v.begin(), v.end())); 
-#define timer cerr << "Time elapsed : " << 1.0 * clock() / CLOCKS_PER_SEC << " sec \n";
+#define res(v) sort(all(v)),v.erase(unique(all(v)), v.end());
+#define timer cerr << "Time elapsed : " << 1.0 * clock() / CLOCKS_PER_SEC << " sec "<<endl;
+#define deb(x) cout<<endl<<"["<<#x<<" = "<<x<<"]"<<endl;
 using vi = std::vector<int>;
 using vvi = std::vector<vi>;
 using pii = std::pair<int,int>;
@@ -45,23 +45,15 @@ const int inf = /*0x3f3f3f3f*/1e18+10;
 const double Pi = 3.14159265;
 #define F first
 #define S second
-int n,m,x;
 void solve(){
-  cin>>n>>m;
-  set<int>a,b;
-  rep(i,1,n)cin>>x,a.insert(x);
-  int y=-1;
-  rep(i,1,m){cin>>x;if(a.count(x))y=x;}
-  if(y==-1)cout<<"NO";
-  else cout<<"YES\n1 "<<y;
+    int x=2;
+    cout<<x;
 }
 int32_t main()
 {
   ibs;cti;
-  // solve()
-  /*,cout<<"\n"*/;
-  // cout<<"\n";
+  // solve();return 0;
   int xx=0;
-  int t;cin>>t;while(t--){/*xx++;cout<<"Case "<<xx<<":\n"*/;solve();cout<<"\n";}
+  int t;cin>>t;while(t--){/*xx++;cout<<"Case "<<xx<<": "*/;solve();cout<<endl;}
   return 0;
 }

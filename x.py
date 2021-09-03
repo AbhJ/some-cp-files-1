@@ -1,90 +1,94 @@
-# keras_server.py 
-
-# Python program to expose a ML model as flask REST API 
-
-# import the necessary modules 
-from keras.applications import ResNet50 # pre-built CNN Model 
-from keras.preprocessing.image import img_to_array 
-from keras.applications import imagenet_utils 
-import tensorflow as tf 
-from PIL import Image 
-import numpy as np 
-import flask 
-import io 
-
-# Create Flask application and initialize Keras model 
-app = flask.Flask(__name__) 
-model = None
-
-# Function to Load the model 
-def load_model(): 
-    
-    # global variables, to be used in another function 
-    global model     
-    model = ResNet50(weights ="imagenet") 
-    global graph 
-    graph = tf.get_default_graph() 
-
-# Every ML/DL model has a specific format 
-# of taking input. Before we can predict on 
-# the input image, we first need to preprocess it. 
-def prepare_image(image, target): 
-    if image.mode != "RGB": 
-        image = image.convert("RGB") 
-    
-    # Resize the image to the target dimensions 
-    image = image.resize(target) 
-    
-    # PIL Image to Numpy array 
-    image = img_to_array(image) 
-    
-    # Expand the shape of an array, 
-    # as required by the Model 
-    image = np.expand_dims(image, axis = 0) 
-    
-    # preprocess_input function is meant to 
-    # adequate your image to the format the model requires 
-    image = imagenet_utils.preprocess_input(image) 
-
-    # return the processed image 
-    return image 
-
-# Now, we can predict the results. 
-@app.route("/predict", methods =["POST"]) 
-def predict(): 
-    data = {} # dictionary to store result 
-    data["success"] = False
-
-    # Check if image was properly sent to our endpoint 
-    if flask.request.method == "POST": 
-        if flask.request.files.get("image"): 
-            image = flask.request.files["image"].read() 
-            image = Image.open(io.BytesIO(image)) 
-
-            # Resize it to 224x224 pixels 
-            # (required input dimensions for ResNet) 
-            image = prepare_image(image, target =(224, 224)) 
-
-        # Predict ! global preds, results 
-            with graph.as_default(): 
-                preds = model.predict(image) 
-                results = imagenet_utils.decode_predictions(preds) 
-                data["predictions"] = [] 
-
-        
-            for (ID, label, probability) in results[0]: 
-                r = {"label": label, "probability": float(probability)} 
-                data["predictions"].append(r) 
-
-            data["success"] = True
-
-    # return JSON response 
-    return flask.jsonify(data) 
+import matplotlib.pyplot as plt
+import random
+import numpy as np
+# in TSP graph is complete
 
 
+class TSP_using_GA(object):
+	# this function initializes the variables in the class for the application of
+	# evolutionary algorithm
+    def __init__(self, location_count, cross_rate, mutation_rate, pop_size):
+        self.location_count = location_count
+        self.cross_rate = cross_rate
+        self.mutation_rate = mutation_rate
+        self.pop_size = pop_size
+        self.pop = np.vstack([np.random.permutation(location_count) for _ in range(pop_size)])
+	# this function is called in plotting graph and helps to create lines for
+	# joining location nodes
+    def helper_for_plotting_graph(self, graph, city_position):
+        line_x = np.empty_like(graph, dtype=np.float64)
+        line_y = np.empty_like(graph, dtype=np.float64)
+        for i, d in enumerate(graph):
+            city_coord = city_position[d]
+            line_x[i, :] = city_coord[:, 0]
+            line_y[i, :] = city_coord[:, 1]
+        return line_x, line_y
+	# this function selects and returns random child of given fitness value
+    def select(self, fitness):
+        idx = np.random.choice(np.arange(self.pop_size), size=self.pop_size, replace=True, p=fitness / fitness.sum())
+        return self.pop[idx]
+	# this function returns fitness of a given graph in terms of metric or euclidean distance
+    def get_fitness(self, line_x, line_y):
+        total_distance = np.empty((line_x.shape[0],), dtype=np.float64)
+        for i, (xs, ys) in enumerate(zip(line_x, line_y)):
+            total_distance[i] = np.sum(np.sqrt(np.square(np.diff(xs)) + np.square(np.diff(ys))))
+        fitness = np.exp(self.location_count * 2 / total_distance)
+        return fitness, total_distance
+	# this is the evolutionary function that keeps getting called till the desired number of generations
+    def evolve(self, fitness):
+        pop = self.select(fitness)
+        pop_copy = pop.copy()
+        for parent in pop:
+            child = self.crossover(parent, pop_copy)
+            child = self.mutate(child)
+            parent[:] = child
+        self.pop = pop
+	# this function generates cross over between two individuals with given cross-over rate
+    def crossover(self, parent, pop):
+        if np.random.rand() < self.cross_rate:
+            i_ = np.random.randint(0, self.pop_size, size=1)                        # select another individual from pop
+            cross_points = np.random.randint(0, 2, self.location_count).astype(bool)      # choose crossover points
+            keep_city = parent[~cross_points]                                       # find the city number
+            swap_city = pop[i_, np.isin(pop[i_].ravel(), keep_city, invert=True)]
+            parent[:] = np.concatenate((keep_city, swap_city))
+        return parent
+	# this function mutates an individual with given mutation rate
+    def mutate(self, child):
+        for point in range(self.location_count):
+            if np.random.rand() < self.mutation_rate:
+                swap_point = np.random.randint(0, self.location_count)
+                swapA, swapB = child[point], child[swap_point]
+                child[point], child[swap_point] = swapB, swapA
+        return child
 
-if __name__ == "__main__": 
-    print(("* Loading Keras model and Flask starting server..."
-        "please wait until server has fully started")) 
-    load_model() 
-    app.run() 
+# this is the main function that runs the evolutionary algorithm
+class ready_for_TSP(object):
+    def __init__(self, n_cities):
+        self.city_position = np.random.rand(n_cities, 2)
+        plt.ion()
+
+    def printer_function(self, lx, ly, total_d):
+        plt.cla()
+        plt.scatter(self.city_position[:, 0].T, self.city_position[:, 1].T, s=100, c='k',)
+        plt.plot(lx.T, ly.T, 'r-',)
+        plt.text(-0.05, -0.05, "Total distance=%.2f" % total_d, fontdict={'size': 20, 'color': np.random.rand(3,)})
+        plt.xlim((-0.1, 1.1))
+        plt.ylim((-0.1, 1.1))
+        plt.pause(0.01)
+location_count = int(input("Enter number of locations (0 - 20) in integer f0orm: ")) # count of locations
+crossover_rate = float(input("Enter crossover rate (0 - 1) in floating point form: ")) # cross over rate
+mutation_rate = float(input("Enter mutation rate (0 - 1) in floating point form: ")) # mutation rate
+generation_count = int(input("Enter number of generations (0 - 100) in integer form: ")) # number of generations
+ga = TSP_using_GA(location_count=location_count, cross_rate=crossover_rate, mutation_rate=mutation_rate, pop_size=500)
+env = ready_for_TSP(location_count)
+for generation in range(generation_count):
+    lx, ly = ga.helper_for_plotting_graph(ga.pop, env.city_position)
+    fitness, total_distance = ga.get_fitness(lx, ly)
+    ga.evolve(fitness)
+    best_idx = np.argmax(fitness)
+    print('Generation index:', generation, '| fitness of fittest tour: %.2f' % fitness[best_idx])
+    env.printer_function(lx[best_idx], ly[best_idx], total_distance[best_idx])
+
+
+plt.ioff()
+plt.show()
